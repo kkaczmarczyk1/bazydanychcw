@@ -1,0 +1,104 @@
+CREATE TABLE pracownik (
+    -> id_pracownika INT auto_increment PRIMARY KEY,
+    -> imie VARCHAR(40) NOT NULL,
+    -> nazwisko VARCHAR(60) NOT NULL,
+    -> data_urodzenia DATE NOT NULL);
+Query OK, 0 rows affected (0.02 sec)
+
+INSERT INTO pracownik (imie, nazwisko, data_urodzenia)
+    -> VALUES ('Marek', 'Kowalski', '1999-03-26'),
+    -> ('Pawel', 'Sikorski', '1985-06-13'),
+    -> ('Wiktor', 'Paluch', '2000-04-02');
+
+ UPDATE pracownik
+    -> SET data_urodzenia = '2001-04-03' WHERE id_pracownika = 3;
+
+
+CREATE TABLE zadanie ( 
+id_zadania INT auto_increment PRIMARY KEY,
+nazwa_zadania VARCHAR(150) NOT NULL,
+priorytet ENUM('normalny', 'wysoki', 'niski'), 
+opis LONGTEXT, 
+pracownik INT, FOREIGN KEY (pracownik) REFERENCES pracownik(id_pracownika));
+
+ALTER TABLE zadanie MODIFY priorytet ENUM('normalny', 'wysoki', 'niski') DEFAULT 'normalny';
+
+INSERT INTO zadanie (nazwa_zadania, priorytet, pracownik)
+    -> VALUES ('projekt bazy', 'normalny', '2'),
+    -> ('wystawienie faktur', 'wysoki', '1'),
+    -> ('sprzatanie magazynu','niski','3');
+
+
+
+CREATE TABLE projekt (
+    -> id_projektu INT auto_increment PRIMARY KEY,
+    -> nazwa_projektu VARCHAR(150),
+    -> data_rozpoczecia DATE,
+    -> data_zakonczenia DATE);
+
+
+ALTER TABLE projekt ADD menadzer_projektu INT;
+ALTER TABLE projekt ADD FOREIGN KEY (menadzer_projektu) REFERENCES pracownik(id_pracownika);
+
+
+ INSERT INTO projekt (nazwa_projektu, data_rozpoczecia)
+    -> VALUES ('studia', '2025-10-01'),
+    -> ('bazy danych', '2025-06-24');
+
+
+
+ALTER TABLE zadanie ADD projekt INT;
+ALTER TABLE zadanie ADD FOREIGN KEY (projekt) REFERENCES projekt(id_projektu) ON DELETE CASCADE;
+
+
+
+ UPDATE zadanie
+    -> SET projekt = 2
+    -> WHERE id_zadania = 1;
+UPDATE zadanie SET projekt = 1 WHERE id_zadania = 2;
+
+
+
+
+ CREATE TABLE sprint (
+    -> id_sprintu INT auto_increment PRIMARY KEY,
+    -> numer_sprintu INT,
+    -> data_rozpoczecia DATE,
+    -> data_zakonczenia DATE);
+
+
+ALTER TABLE zadanie ADD sprint INT;
+ALTER TABLE zadanie ADD FOREIGN KEY (sprint) REFERENCES sprint(id_sprintu) ON DELETE SET NULL;
+
+
+INSERT INTO sprint (numer_sprintu, data_rozpoczecia)
+    -> VALUES (234, '2025-04-23');
+UPDATE zadanie SET sprint = 1 WHERE id_zadania = 1 AND 3;
+
+
+
+ CREATE TABLE status (
+    -> id_statusu INT auto_increment PRIMARY KEY,
+    -> nazwa_statusu VARCHAR(20));
+
+
+INSERT INTO status (nazwa_statusu) VALUES ('wykonane'), ('niewykonane'), ('oczekiwane');
+
+
+ CREATE TABLE zadanie_has_status (
+    -> id_zdarzenia INT auto_increment PRIMARY KEY,
+    -> id_zadania INT, FOREIGN KEY (id_zadania) REFERENCES zadanie(id_zadania),
+    -> id_statusu INT, FOREIGN KEY (id_statusu) REFERENCES status(id_statusu),
+    -> data_zdarzenia DATETIME DEFAULT CURRENT_TIMESTAMP);
+
+
+ INSERT INTO zadanie_has_status (id_zadania, id_statusu)
+    -> VALUES (1, 2)
+    -> , (2, 3),
+    -> (3, 1);
+
+DELETE FROM projekt where id_projektu=1;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`infs_kaczmarczykk`.`zadanie_has_status`, CONSTRAINT `zadanie_has_status_ibfk_1` FOREIGN KEY (`id_zadania`) REFERENCES `zadanie` (`id_zadania`))
+
+DROP TABLE sprint;
+ERROR 3730 (HY000): Cannot drop table 'sprint' referenced by a foreign key constraint 'zadanie_ibfk_3' on table 'zadanie'.
