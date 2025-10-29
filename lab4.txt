@@ -1,0 +1,67 @@
+1.1  alter table projekt drop constraint projekt_ibfk_1;
+ alter table zadanie drop constraint zadanie_ibfk_1;
+
+1.2. alter table pracownik drop id_pracownika;
+
+1.3. alter table pracownik modify id_pracownika int primary key  not null auto_increment;
+
+1.4.  alter table projekt add foreign key (menadzer_projektu) references pracownik(id_pracownika) on delete set null;
+
+
+
+
+2.1.  ALTER TABLE zadanie ADD COLUMN godziny_szacowane int default 8;
+
+2.2. update zadanie set godziny_szacowane = 4 where id_zadania = 1;
+     update zadanie set godziny_szacowane = 12 where id_zadania = 2;
+     update zadanie set godziny_szacowane = 16 where id_zadania = 3;
+
+2.3. Alter table zadanie alter column godziny_szacowane set default 6;
+
+2.4. Insert into zadanie (nazwa_zadania, pracownik)
+     values ('wysprzatac magazyn', 2);
+
+select * from zadanie;
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+| id_zadania | nazwa_zadania       | priorytet | opis | pracownik | projekt | sprint | godziny_szacowane |
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+|          1 | projekt bazy        | normalny  | NULL |         2 |       2 |      1 |                 4 |
+|          2 | wystawienie faktur  | wysoki    | NULL |         1 |       1 |   NULL |                12 |
+|          3 | sprzatanie magazynu | niski     | NULL |         3 |    NULL |   NULL |                16 |
+|          4 | wysprzatac magazyn  | normalny  | NULL |         2 |    NULL |   NULL |                 6 |
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+
+ delete from zadanie where id_zadania = 4;
+
+3.1. Alter table projekt add column opis_krotki varchar(50) null;
+
+3.2.  alter table projekt modify opis_krotki varchar(200);
+
+3.3. update projekt set opis_krotki = 'MVP' where id_projektu = 1;
+
+3.4. alter table projekt drop column opis_krotki;
+
+
+
+4.1. alter table zadanie drop constraint zadanie_ibfk_2;
+
+4.2. alter table zadanie add foreign key (projekt) references projekt(id_projektu) on delete set null;
+
+4.3. delete from projekt where id_projektu = 2;
+
+4.4.  select * from zadanie
+    -> ;
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+| id_zadania | nazwa_zadania       | priorytet | opis | pracownik | projekt | sprint | godziny_szacowane |
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+|          1 | projekt bazy        | normalny  | NULL |         2 |    NULL |      1 |                 4 |
+|          2 | wystawienie faktur  | wysoki    | NULL |         1 |       1 |   NULL |                12 |
+|          3 | sprzatanie magazynu | niski     | NULL |         3 |    NULL |   NULL |                16 |
++------------+---------------------+-----------+------+-----------+---------+--------+-------------------+
+
+
+
+
+
+
+
