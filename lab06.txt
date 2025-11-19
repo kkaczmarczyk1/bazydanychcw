@@ -1,0 +1,45 @@
+Zad 1.
+
+1. SELECT AVG(pensja) AS srednia_pensja FROM employee;
+
+2. SELECT JOB_POSITION_ID, AVG(pensja) AS srednia_pensja, COUNT(*) AS liczba_pracownikow FROM employee GROUP BY JOB_POSITION_ID;
+
+3. SELECT DEPARTMENT_ID, AVG(YEAR(CURDATE()) - YEAR(BIRTH_DATE)) AS sredni_wiek FROM employee GROUP BY DEPARTMENT_ID;
+
+
+Zad 2.
+
+1. SELECT DEPARTMENT_ID, SUM(pensja) AS laczna_pensja FROM employee GROUP BY DEPARTMENT_ID ORDER BY laczna_pensja DESC;
+
+2. SELECT JOB_POSITION_ID, AVG(pensja) AS srednia_pensja, COUNT(*) AS liczba_pracownikow FROM employee GROUP BY JOB_POSITION_ID HAVING COUNT(*) >= 3 AND AVG(pensja) > 3000;
+
+3.  SELECT DEPARTMENT_ID, COUNT(DISTINCT pensja) AS liczba_roznych_pensji FROM employee GROUP BY DEPARTMENT_ID HAVING COUNT(*) > 4 ORDER BY liczba_roznych_pensji ASC;
+
+Zad 3. 
+
+1. CREATE TABLE department AS SELECT * FROM company_2025.DEPARTMENT;
+   CREATE TABLE job_position AS SELECT * FROM company_2025.JOB_POSITION;
+
+2. SELECT d.DEPARTMENT_NAME AS nazwa_departamentu, COUNT(e.EMPLOYEE_NAME) AS liczba_pracownikow FROM department d LEFT JOIN employee e ON d.DEPARTMENT_ID = e.DEPARTMENT_ID GROUP BY d.DEPARTMENT_NAME;
+
+3.  SELECT d.DEPARTMENT_NAME AS nazwa_departamentu, GROUP_CONCAT(CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) SEPARATOR ', ') AS pracownicy FROM department d LEFT
+JOIN employee e ON d.DEPARTMENT_ID = e.DEPARTMENT_ID GROUP BY d.DEPARTMENT_NAME;
+
+Zad 4. 
+
+1. SELECT e.LAST_NAME, jp.POSITION_NAME AS stanowisko FROM employee e NATURAL JOIN job_position jp WHERE YEAR(e.BIRTH_DATE) BETWEEN 1990 AND 1999;
+
+2. SELECT e.FIRST_NAME, e.LAST_NAME FROM employee e JOIN job_position jp ON e.JOB_POSITION_ID = jp.JOB_POSITION_ID WHERE jp.POSITION_NAME = 'Magazynier' ORDER BY e.BIRTH_DATE DESC LIMIT 5;
+
+3. SELECT c1.SHORT_NAME AS client1, c2.SHORT_NAME AS client2 FROM client c1 join client c2 on c1.CLIENT_ID + 5 = c2.CLIENT_ID ORDER BY c1.CLIENT_ID;
+
+Zad 5.
+
+1. SELECT jp.POSITION_NAME AS stanowisko, AVG(e.pensja) AS srednia_pensja, COUNT(*) AS liczba_pracownikow FROM employee e JOIN job_position jp ON e.JOB_POSITION_ID = jp.JOB_POSITION_ID JOIN department d  ON e.DEPARTMENT_ID = d.DEPARTMENT_ID WHERE d.DEPARTMENT_NAME NOT IN ('IT', 'HR') GROUP BY jp.POSITION_NAME HAVING COUNT(*) > 3;
+
+2.  SELECT e.JOB_POSITION_ID, jp.POSITION_NAME AS stanowisko, e.FIRST_NAME, e.LAST_NAME, e.BIRTH_DATE, (SELECT MAX(BIRTH_DATE) FROM employee WHERE JOB_POSITION_ID = e.JOB_POSITION_ID) AS najmlodszy, (SELECT MIN(BIRTH_DATE) FROM employee WHERE JOB_POSITION_ID = e.JOB_POSITION_ID) AS najstarszy, d.DEPARTMENT_NAME as departament FROM employee e JOIN job_position jp ON e.JOB_POSITION_ID = jp.JOB_POSITION_ID JOIN department d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID ORDER BY
+jp.POSITION_NAME, e.LAST NAME;
+
+
+
+
