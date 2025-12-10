@@ -1,0 +1,145 @@
+ZAD 1.
+
+1. SELECT
+   c.FULL_NAME,
+   ca.STREET,
+   LENGTH(ca.STREET) AS dlugosc_ulicy,
+   LEFT(ca.STREET, 5) AS pierwsze_5_liter_ulicy
+FROM
+   CLIENT c
+JOIN
+   CLIENT_ADDRESS ca ON c.CLIENT_ID = ca.CLIENT_ID;
+
+2. SELECT
+   LEFT(c.FULL_NAME, 15) AS skrocona_nazwa_klienta,
+   at.ADDRESS_TYPE_NAME
+FROM
+   CLIENT c
+LEFT JOIN
+   CLIENT_ADDRESS ca ON c.CLIENT_ID = ca.CLIENT_ID
+LEFT JOIN
+   ADDRESS_TYPE at ON ca.ADDRESS_TYPE_ID = at.ADDRESS_TYPE_ID;
+
+3. SELECT
+   p.PRODUCT_NAME,
+   cat.CATEGORY_NAME,
+   LEFT(p.PRODUCT_NAME, 3) AS pierwsze_3_znaki_produktu
+FROM
+   PRODUCT p
+JOIN
+   CATEGORY cat ON p.CATEGORY_ID = cat.CATEGORY_ID;
+
+4. SELECT DISTINCT
+   p.PRODUCT_NAME,
+   p.DESCRIPTION
+FROM
+   PRODUCT p
+JOIN
+   ORDER_POSITION op ON p.PRODUCT_ID = op.PRODUCT_ID;
+
+ZAD 2.
+
+1. SELECT
+   c.FULL_NAME,
+   o.ORDER_ID,
+   o.ORDER_DATE,
+   DATEDIFF(CURRENT_DATE(), o.ORDER_DATE) AS dni_od_zamowienia
+FROM
+   CLIENT c
+JOIN
+   `ORDER` o ON c.CLIENT_ID = o.CLIENT_ID;
+
+2. SELECT
+   o.ORDER_ID,
+   os.STATUS_NAME,
+   DATE_FORMAT(o.ORDER_DATE, '%Y-%m-%d') AS termin_realizacji
+FROM
+   `ORDER` o
+JOIN
+   ORDER_STATUS os ON o.STATUS_ID = os.STATUS_ID
+WHERE
+   os.STATUS_NAME NOT IN ('Zwrócone', 'Zamknięte');
+
+3. SELECT
+   e.FIRST_NAME,
+   e.LAST_NAME,
+   e.DATE_OF_EMPLOYMENT,
+   DAYNAME(e.DATE_OF_EMPLOYMENT) AS dzien_tygodnia_zatrudnienia,
+   d.DEPARTMENT_NAME
+FROM
+   EMPLOYEE e
+LEFT JOIN
+   DEPARTMENT d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID;
+
+4. SELECT
+   c.FULL_NAME,
+   T.MIN_DATE_ORDER,
+   T.MAX_DATE_ORDER,
+   DATEDIFF(T.MAX_DATE_ORDER, T.MIN_DATE_ORDER) AS roznica_dni_miedzy_zamowieniami
+FROM
+   CLIENT c
+LEFT JOIN (
+   SELECT
+       CLIENT_ID,
+       MIN(ORDER_DATE) AS MIN_DATE_ORDER,
+       MAX(ORDER_DATE) AS MAX_DATE_ORDER
+   FROM
+       `ORDER`
+   GROUP BY
+       CLIENT_ID
+) AS T ON c.CLIENT_ID = T.CLIENT_ID;
+
+ZAD 3.
+
+1.  LEFT(c.FULL_NAME, 15) AS skrocona_nazwa_klienta,
+   GROUP_CONCAT(CONCAT(ca.STREET, ' ', ca.CITY) SEPARATOR ', ') AS lista_adresow
+FROM
+   CLIENT c
+JOIN
+   CLIENT_ADDRESS ca ON c.CLIENT_ID = ca.CLIENT_ID
+GROUP BY
+   c.CLIENT_ID, skrocona_nazwa_klienta;
+
+2. SELECT
+   ca.CITY,
+   GROUP_CONCAT(DISTINCT LEFT(ca.POSTAL_CODE, 2) SEPARATOR ', ') AS unikalne_prefixy_kodow
+FROM
+   CLIENT_ADDRESS ca
+GROUP BY
+   ca.CITY;
+
+3. SELECT
+   CONCAT(e.LAST_NAME, ' ', e.FIRST_NAME) AS pracownik,
+   d.DEPARTMENT_NAME AS dzial,
+   DATEDIFF(CURRENT_DATE(), e.DATE_OF_EMPLOYMENT) AS dni_od_zatrudnienia
+FROM
+   EMPLOYEE e
+LEFT JOIN
+   DEPARTMENT d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID;
+
+4. SELECT
+   CONCAT(c.FULL_NAME, ' - ', SUBSTRING(REPLACE(c.FULL_NAME, ' ', ''), 1, 10)) AS nazwa_pelna_i_skrocona
+FROM
+   CLIENT c;
+
+5. SELECT
+   o.ORDER_ID,
+   RIGHT(o.ORDER_ID, 3) AS ostatnie_3_cyfry
+FROM
+   `ORDER` o
+WHERE
+   LENGTH(o.ORDER_ID) < 7;
+
+6. SELECT
+   e.FIRST_NAME,
+   e.LAST_NAME,
+   d.DEPARTMENT_NAME,
+   CONCAT(
+       LOWER(LEFT(e.FIRST_NAME, 3)), -- 1. pierwsze 3 litery imienia (małe)
+       UPPER(RIGHT(e.LAST_NAME, 4)),  -- 2. ostatnie 4 znaki nazwiska (duże)
+       (LENGTH(e.FIRST_NAME) + LENGTH(d.DEPARTMENT_NAME)) -- 3. suma długości imienia i nazwy działu (zastępcza długość ulicy)
+   ) AS haslo_zastepcze
+FROM
+   EMPLOYEE e
+LEFT JOIN
+   DEPARTMENT d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID;
